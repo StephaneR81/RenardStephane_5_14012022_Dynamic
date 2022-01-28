@@ -61,7 +61,7 @@ function getBasket() {
 }
 
 //Creates and prints the sofa card from basket element.
-function createSofaCard(productArray) {
+function createSofaCard(productDetails) {
   const basket = getBasket();
 
   //Creating card HTML elements.
@@ -74,8 +74,8 @@ function createSofaCard(productArray) {
   itemImgElement.classList = "cart__item__img";
 
   const imgElement = document.createElement("img");
-  imgElement.src = productArray.imageUrl;
-  imgElement.alt = productArray.altTxt + ", " + productArray.name;
+  imgElement.src = productDetails.imageUrl;
+  imgElement.alt = productDetails.altTxt + ", " + productDetails.name;
 
   const itemContentElement = document.createElement("div");
   itemContentElement.classList = "cart__item__content";
@@ -84,13 +84,13 @@ function createSofaCard(productArray) {
   contentDescriptionElement.classList = "cart__item__content__description";
 
   const nameElement = document.createElement("h2");
-  nameElement.textContent = productArray.name;
+  nameElement.textContent = productDetails.name;
 
   const colorElement = document.createElement("p");
   colorElement.textContent = basket.color;
 
   const priceElement = document.createElement("p");
-  priceElement.textContent = productArray.price + " €";
+  priceElement.textContent = productDetails.price + " €";
 
   const settingsElement = document.createElement("div");
   settingsElement.classList = "cart__item__content__settings";
@@ -133,7 +133,7 @@ function createSofaCard(productArray) {
 }
 
 //FORMULAR RELATED FUNCTIONS
-
+//Checks firstName formular field. Returns boolean.
 function checkFirstName() {
   const firstNameRegEx = new RegExp("^[A-Za-zéèëêàçüû\-]{1,30}$");
   if (!firstNameRegEx.test(firstNameSelector.value)) {
@@ -144,6 +144,7 @@ function checkFirstName() {
   return true;
 }
 
+//Checks lastName formular field. Returns boolean.
 function checkLastname() {
   const lastNameRegEx = new RegExp("^[A-Za-zéèëêàçüû\ \-]{1,30}$");
   if (!lastNameRegEx.test(lastNameSelector.value)) {
@@ -154,6 +155,7 @@ function checkLastname() {
   return true;
 }
 
+//Checks address formular field. Returns boolean.
 function checkAddress() {
   const addressRegEx = new RegExp("^[A-Za-z0-9]{1,}[A-Za-z0-9éèëêàçüû\ \-\.\,]{1,}$");
   if ((!addressRegEx.test(addressSelector.value)) ||
@@ -166,6 +168,7 @@ function checkAddress() {
   return true;
 }
 
+//Checks city formular field. Returns boolean.
 function checkCity() {
   const cityRegEx = new RegExp("^[A-Za-z0-9éèëêàçüû\-]{1,30}$");
   if (!cityRegEx.test(citySelector.value)) {
@@ -176,6 +179,7 @@ function checkCity() {
   return true;
 }
 
+//Checks email formular field. Returns boolean.
 function checkEmail() {
   const mailRegEx = new RegExp("^[A-Za-z0-9._-]+[@]{1}[a-zA-Z0-9._-]+[.]{1}[a-zA-Z]{2,10}$");
   if (!mailRegEx.test(emailSelector.value)) {
@@ -186,6 +190,60 @@ function checkEmail() {
   return true;
 }
 
+//Checks if the whole formular fields are valid. Returns boolean.
+function isValidFormular() {
+  if (checkFirstName() &&
+    checkLastname() &&
+    checkAddress() &&
+    checkCity() &&
+    checkEmail()) {
+    return true;
+  }
+  return false;
+}
+
+//Returns the total of all items in basket. (Number)
+function basketTotalItems() {
+  const basket = getBasket();
+  return Number(basket.quantity);
+}
+
+//Returns the total price of the order. (Number)
+function basketTotalPrice(fetchedData) {
+  const basket = getBasket();
+  const quantity = Number(basket.quantity);
+  const unitPrice = Number(fetchedData.price);
+  return quantity * unitPrice;
+}
+
+//Returns a "contact" object.
+function createContact() {
+  const contact = {
+    contact: {
+      "firstName": firstNameSelector.value,
+      "lastName": lastNameSelector.value,
+      "address": addressSelector.value,
+      "city": citySelector.value,
+      "email": emailSelector.value
+    }
+  }
+  return contact;
+}
+
+//Returns an "order" array representing items to purchase.
+function createOrder() {
+let items = [];
+return items;
+}
+
+//Returns a stringified "body" (contact + order) for sending to API
+function createBody() {
+  const contact = createContact();
+  const order = createOrder();
+  let body;
+  return JSON.stringify(body);
+}
+
 //Fetches informations from API for one product.
 function fetchSofaDetails() {
   fetch(getProductURL())
@@ -194,18 +252,10 @@ function fetchSofaDetails() {
       return response.json();
     })
 
-    .then((productArray) => {
-
-      const basket = getBasket();
-
-      const unitPrice = Number(productArray.price);
-      const quantity = Number(basket.quantity);
-      const total = unitPrice * quantity;
-
-      totalQuantitySelector.textContent = quantity;
-      totalPriceSelector.textContent = total;
-
-      createSofaCard(productArray);
+    .then((productDetails) => {
+      createSofaCard(productDetails);
+      totalQuantitySelector.textContent = basketTotalItems().toString();
+      totalPriceSelector.textContent = basketTotalPrice(productDetails).toString();
     })
 
     .catch((error) => {
@@ -223,11 +273,7 @@ submitSelector.addEventListener("click", (e) => {
 
   const basket = getBasket();
 
-  if (checkFirstName() &&
-    checkLastname() &&
-    checkAddress() &&
-    checkCity() &&
-    checkEmail()) {
+  if (isValidFormular()) {
 
     let toSend = {
       contact: {
