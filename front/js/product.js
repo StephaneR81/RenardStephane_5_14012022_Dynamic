@@ -1,112 +1,115 @@
 // KANAP PRODUCT PAGE SCRIPT
 
-/////////////
-//VARIABLES/
-///////////
+//|||||||||||
+//|VARIABLES|
+//|||||||||||
 
-// GETTING CURRENT PRODUCT ID FROM URL
-let params = new URLSearchParams(window.location.search);
-const productId = params.has("id") ? params.get("id") : null;
-const productURL = `http://localhost:3000/api/products/${productId}`;
-
-//ELEMENTS SELECTORS
-const productImgSelector = document.querySelector(".item__img");
-const productNameSelector = document.querySelector("#title");
+//Element selectors
+const imgSelector = document.querySelector(".item__img");
+const nameSelector = document.querySelector("#title");
 const priceSelector = document.querySelector("#price");
 const descriptionSelector = document.querySelector("#description");
 const colorSelector = document.querySelector("#colors");
 const quantitySelector = document.querySelector("#quantity");
-const submitButtonSelector = document.querySelector("#addToCart");
-
-//INITIALIZING PRODUCT QUANTITY TO 1
-quantitySelector.value = 1;
+const submitSelector = document.querySelector("#addToCart");
 
 
+//|||||||||||
+//|FUNCTIONS|
+//|||||||||||
 
-/////////////
-//FUNCTIONS/
-///////////
+//Fetches all informations from API for one product.
+function fetchSofaDetails() {
 
-function getProduct() {
-
-    fetch(productURL)
+    fetch(getProductURL())
 
         .then(
-            function (response) {
+            (response) => {
                 return response.json();
             })
 
         .then(
-            function (productArray) {
-                getItemCard(productArray);
+            (sofa) => {
+                createSofaCard(sofa);
+                quantitySelector.value = 1;
             })
 
         .catch(
-            function (error) {
-                alert("Le produit n'a pu être affiché.\nVeuillez revenir ultérieurement. ");
+            (error) => {
+                alert("Le produit n'a pu être affiché.\nVeuillez retenter ultérieurement. ");
                 console.error(error);
             });
 }
 
-//CREATES AND APPENDS SELECTED PRODUCT INFORMATIONS (IMAGE, DESCRIPTION, PRICE ETC.)
-function getItemCard(productArray) {
-
+//Creates and appends HTML elements for printing the product card.
+function createSofaCard(sofa) {
     const imgElement = document.createElement("img");
-    imgElement.src = productArray.imageUrl;
-    imgElement.setAttribute("alt", productArray.altTxt);
-    productImgSelector.append(imgElement);
+    imgElement.src = sofa.imageUrl;
+    imgElement.alt = sofa.altTxt;
+    imgSelector.append(imgElement);
 
-    productNameSelector.textContent = productArray.name;
+    nameSelector.textContent = sofa.name;
+    priceSelector.textContent = sofa.price;
+    descriptionSelector.textContent = sofa.description;
 
-    priceSelector.textContent = productArray.price;
-
-    descriptionSelector.textContent = productArray.description;
-
-    for (const color of productArray.colors) {
+    for (const color of sofa.colors) {
         const colorElement = document.createElement("option");
-        colorElement.setAttribute("value", color);
+        colorElement.value = color;
         colorElement.textContent = color;
         colorSelector.append(colorElement);
     }
 }
 
-//RETURNS TRUE IF ENTERED QUANTITY IS VALID, OR FALSE IF NOT.
-function isValidQuantity() {
-    let value = quantitySelector.value;
-    return (isNaN(value) || value == "" || value < 1 || value > 100) ? false : true;
+//Returns the current product ID from URL (String), or null.
+function getProductID() {
+    let params = new URLSearchParams(window.location.search);
+    return params.has("id") ? params.get("id") : null;
 }
 
-//RETURNS TRUE IF A COLOR IS SELECTED, OR FALSE IF NOT.
+//Returns the API URL for the current product (String).
+function getProductURL() {
+    const productURL = `http://localhost:3000/api/products/${getProductID()}`;
+    return productURL;
+}
+
+//FORMULAR RELATED FUNCTIONS
+//Checks if the selected quantity is a number between 1 and 100. Returns boolean.
+function isValidQuantity() {
+    const value = quantitySelector.value;
+    return (isNaN(value) || value === "" || value < 1 || value > 100) ? false : true;
+}
+
+//Checks if a color has been selected. Returns boolean.
 function isValidColor() {
     const value = colorSelector.options[colorSelector.selectedIndex].value;
     return value === "" || value === null ? false : true;
 }
 
-//ADDS BASKET TO LOCAL STORAGE
+//BASKET RELATED FUNCTIONS
+//Adds basket to local storage.
 function storeBasket(item) {
     localStorage.setItem("basket", JSON.stringify(item));
 }
 
-//GET BASKET FROM LOCAL STORAGE
+//Gets basket from local storage.
 function getBasket() {
     let basket = localStorage.getItem("basket");
-    return (basket !== null) ? JSON.parse(basket) : new Array(); //CREATES BASKET IF NOT
+    return (basket !== null) ? JSON.parse(basket) : new Array(); //Creates basket if not.
 }
 
-//ADDS ITEM TO BASKET
+//Adds items to basket
 function addToBasket(item) {
     let basket = getBasket();
-
     storeBasket(item);
 }
 
+//|||||||||||
+//|LISTENERS|
+//|||||||||||
 
-
-//EVENT LISTENERS
-
-submitButtonSelector.addEventListener("click", function () {
+//Adds a "CLICK" listener to the "ADD TO CART" button.
+submitSelector.addEventListener("click", () => {
     if (isValidColor() && isValidQuantity()) {
-
         const color = colorSelector.options[colorSelector.selectedIndex].value;
         const quantity = quantitySelector.value;
 
@@ -117,13 +120,11 @@ submitButtonSelector.addEventListener("click", function () {
         };
 
         addToBasket(item);
-
         window.location.href = "./cart.html?id=" + productId;
-
     } else {
-        //ALERT CUSTOMER IF DATA ARE WRONG
         alert("Vérifiez votre saisie");
     }
 })
 
-getProduct();
+//Function call, to fetch product informations.
+fetchSofaDetails();
