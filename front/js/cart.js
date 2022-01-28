@@ -4,7 +4,6 @@
 //|VARIABLES|
 //|||||||||||
 
-const orderUrl = "http://localhost:3000/api/products/order"
 const productId = getProductID();
 
 const errorMsgColor = "red";
@@ -202,6 +201,23 @@ function isValidFormular() {
   return false;
 }
 
+//Updates item quantity in basket.
+function updateBasketQuantity(newQuantity) {
+  let basket = getBasket();
+  basket.quantity = newQuantity;
+  storeBasket(basket);
+}
+
+//Prints total price.
+function printTotalPrice() {
+  totalPriceSelector.textContent = basketTotalPrice();
+}
+
+//Prints total items quantity
+function printTotalQuantity() {
+  totalQuantitySelector.textContent = basketTotalItems();
+}
+
 //Returns the total of all items in basket. (Number)
 function basketTotalItems() {
   const basket = getBasket();
@@ -219,29 +235,70 @@ function basketTotalPrice(fetchedData) {
 //Returns a "contact" object.
 function createContact() {
   const contact = {
-    contact: {
-      "firstName": firstNameSelector.value,
-      "lastName": lastNameSelector.value,
-      "address": addressSelector.value,
-      "city": citySelector.value,
-      "email": emailSelector.value
-    }
+    "firstName": firstNameSelector.value,
+    "lastName": lastNameSelector.value,
+    "address": addressSelector.value,
+    "city": citySelector.value,
+    "email": emailSelector.value
   }
   return contact;
 }
 
 //Returns an "order" array representing items to purchase.
 function createOrder() {
-let items = [];
-return items;
+  const basket = getBasket();
+  let products = [];
+  for (const key in basket) {
+    if ((key == "id") && (typeof basket.id === "string")) {
+      products.push(basket.id);
+    }
+  }
+  return products;
 }
 
 //Returns a stringified "body" (contact + order) for sending to API
-function createBody() {
+function getBody() {
   const contact = createContact();
-  const order = createOrder();
-  let body;
+  const products = createOrder();
+
+  let body = {
+    contact,
+    products
+  };
   return JSON.stringify(body);
+}
+
+//Redirects the customer on confirmation page
+function redirectConfirmation(orderId) {
+  window.location = "./confirmation.html?orderId=" + orderId;
+}
+
+//Sends the order to API
+function sendOrder() {
+  const orderUrl = "http://localhost:3000/api/products/order";
+
+  const headers = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: getBody()
+  }
+
+  fetch(orderUrl, headers)
+
+    .then((response) => {
+      return response.json();
+    })
+
+    .then((data) => {
+      console.table(data);
+      redirectConfirmation(data.orderId);
+
+    })
+    .catch((error) => {
+      console.error("sendOrder() function error " + error);
+    });
 }
 
 //Fetches informations from API for one product.
@@ -270,55 +327,8 @@ function fetchSofaDetails() {
 
 submitSelector.addEventListener("click", (e) => {
   e.preventDefault();
-
-  const basket = getBasket();
-
   if (isValidFormular()) {
-
-    let toSend = {
-      contact: {
-        "firstName": firstNameSelector.value,
-        "lastName": lastNameSelector.value,
-        "address": addressSelector.value,
-        "city": citySelector.value,
-        "email": emailSelector.value
-      },
-      products: []
-    };
-
-
-    for (const key in basket) {
-      if ((key == "id") && (typeof basket.id === "string")) {
-        toSend.products.push(basket.id);
-      }
-    }
-
-    fetch(orderUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(toSend)
-
-      }).then(function (response) {
-        console.log("RESPONSE POST ", response);
-        return response.json();
-      })
-      .then(function (data) {
-        console.table(data);
-
-        const orderId = data.orderId;
-        const url = "./confirmation.html?orderId=" + orderId;
-        window.location = url;
-
-      })
-      .catch(function (error) {
-        console.error("CATCH ERROR POST " + error);
-      });
-
-
-  } else {
-    //ANNULER L ENVOI 
+    sendOrder();
   }
 });
 
