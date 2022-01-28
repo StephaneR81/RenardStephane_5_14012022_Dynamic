@@ -1,18 +1,16 @@
 //CART SCRIPT PAGE
 
-//VARIABLES
+//|||||||||||
+//|VARIABLES|
+//|||||||||||
+
+const orderUrl = "http://localhost:3000/api/products/order"
+const productId = getProductID();
 
 const errorMsgColor = "red";
 const inputErrorMsg = "Veuillez vérifier la saisie du champ ci-dessus";
-const orderIdSelector = document.querySelector("#orderId");
 
-// GETTING CURRENT PRODUCT ID FROM URL
-let params = new URLSearchParams(window.location.search);
-const productId = params.has("id") ? params.get("id") : null;
-const productURL = `http://localhost:3000/api/products/${productId}`;
-const orderUrl = "http://localhost:3000/api/products/order"
-
-//ELEMENTS SELECTORS
+//Element selectors
 const cartItemsSelector = document.querySelector("#cart__items");
 
 const totalQuantitySelector = document.querySelector("#totalQuantity");
@@ -40,42 +38,50 @@ emailErrorMsgSelector.style.color = errorMsgColor;
 
 const submitSelector = document.querySelector("#order");
 
-//FUNCTIONS
+//|||||||||||
+//|FUNCTIONS|
+//|||||||||||
 
-//GET BASKET FROM LOCAL STORAGE
-function getBasket() {
-  let basket = localStorage.getItem("basket");
-  return basket !== null ? JSON.parse(basket) : false; //Returns basket or false if it is not created.
+//Returns the current product ID from URL (String), or null.
+function getProductID() {
+  let params = new URLSearchParams(window.location.search);
+  return params.has("id") ? params.get("id") : null;
 }
 
-//CREATES PRODUCT CARD
-function createItemCard(productArray) {
+//Returns the API URL for the current product (String).
+function getProductURL() {
+  const productURL = `http://localhost:3000/api/products/${productId}`;
+  return productURL;
+}
+
+//Returns basket from local storage, or false.
+function getBasket() {
+  let basket = localStorage.getItem("basket");
+  return basket !== null ? JSON.parse(basket) : false;
+}
+
+//Creates and prints the sofa card from basket element.
+function createSofaCard(productArray) {
   const basket = getBasket();
 
-  //CREATING ELEMENTS
+  //Creating card HTML elements.
   const itemElement = document.createElement("article");
-  itemElement.setAttribute("class", "cart__item");
+  itemElement.classList = "cart__item";
   itemElement.setAttribute("data-id", productId);
   itemElement.setAttribute("data-color", basket.color);
 
   const itemImgElement = document.createElement("div");
-  itemImgElement.setAttribute("class", "cart__item__img");
+  itemImgElement.classList = "cart__item__img";
 
   const imgElement = document.createElement("img");
   imgElement.src = productArray.imageUrl;
-  imgElement.setAttribute(
-    "alt",
-    productArray.altTxt + ", " + productArray.name
-  );
+  imgElement.alt = productArray.altTxt + ", " + productArray.name;
 
   const itemContentElement = document.createElement("div");
-  itemContentElement.setAttribute("class", "cart__item__content");
+  itemContentElement.classList = "cart__item__content";
 
   const contentDescriptionElement = document.createElement("div");
-  contentDescriptionElement.setAttribute(
-    "class",
-    "cart__item__content__description"
-  );
+  contentDescriptionElement.classList = "cart__item__content__description";
 
   const nameElement = document.createElement("h2");
   nameElement.textContent = productArray.name;
@@ -87,32 +93,29 @@ function createItemCard(productArray) {
   priceElement.textContent = productArray.price + " €";
 
   const settingsElement = document.createElement("div");
-  settingsElement.setAttribute("class", "cart__item__content__settings");
+  settingsElement.classList = "cart__item__content__settings";
 
   const quantityElement = document.createElement("div");
-  quantityElement.setAttribute(
-    "class",
-    "cart__item__content__settings__quantity"
-  );
+  quantityElement.classList = "cart__item__content__settings__quantity";
 
   const quantityValueElement = document.createElement("p");
   quantityValueElement.textContent = "Qté : " + basket.quantity;
 
   const inputQuantity = document.createElement("input");
-  inputQuantity.setAttribute("type", "number");
-  inputQuantity.setAttribute("class", "itemQuantity");
-  inputQuantity.setAttribute("name", "itemQuantity");
-  inputQuantity.setAttribute("min", "1");
-  inputQuantity.setAttribute("max", "100");
-  inputQuantity.setAttribute("value", basket.quantity);
+  inputQuantity.type = "number";
+  inputQuantity.classList = "itemQuantity";
+  inputQuantity.name = "itemQuantity";
+  inputQuantity.min = "1";
+  inputQuantity.max = "100";
+  inputQuantity.value = basket.quantity;
 
   const deleteElement = document.createElement("div");
-  deleteElement.setAttribute("class", "cart__item__content__settings__delete");
+  deleteElement.classList = "cart__item__content__settings__delete";
 
   const deleteItemElement = document.createElement("p");
   deleteItemElement.textContent = "Supprimer";
 
-  //APPEND CREATED ELEMENTS
+  //Appends HTML previously created elements.
   cartItemsSelector.append(itemElement);
   itemElement.append(itemImgElement);
   itemImgElement.append(imgElement);
@@ -129,7 +132,8 @@ function createItemCard(productArray) {
   deleteElement.append(deleteItemElement);
 }
 
-//FORM CONTROLS
+//FORMULAR RELATED FUNCTIONS
+
 function checkFirstName() {
   const firstNameRegEx = new RegExp("^[A-Za-zéèëêàçüû\-]{1,30}$");
   if (!firstNameRegEx.test(firstNameSelector.value)) {
@@ -152,7 +156,6 @@ function checkLastname() {
 
 function checkAddress() {
   const addressRegEx = new RegExp("^[A-Za-z0-9]{1,}[A-Za-z0-9éèëêàçüû\ \-\.\,]{1,}$");
-
   if ((!addressRegEx.test(addressSelector.value)) ||
     (addressSelector.value === "") ||
     (addressSelector.value === null)) {
@@ -175,7 +178,6 @@ function checkCity() {
 
 function checkEmail() {
   const mailRegEx = new RegExp("^[A-Za-z0-9._-]+[@]{1}[a-zA-Z0-9._-]+[.]{1}[a-zA-Z]{2,10}$");
-
   if (!mailRegEx.test(emailSelector.value)) {
     emailErrorMsgSelector.textContent = inputErrorMsg;
     return false;
@@ -184,13 +186,15 @@ function checkEmail() {
   return true;
 }
 
-function getProduct() {
-  fetch(productURL)
-    .then(function (response) {
+//Fetches informations from API for one product.
+function fetchSofaDetails() {
+  fetch(getProductURL())
+
+    .then((response) => {
       return response.json();
     })
 
-    .then(function (productArray) {
+    .then((productArray) => {
 
       const basket = getBasket();
 
@@ -201,16 +205,19 @@ function getProduct() {
       totalQuantitySelector.textContent = quantity;
       totalPriceSelector.textContent = total;
 
-      createItemCard(productArray);
+      createSofaCard(productArray);
     })
 
-    .catch(function (error) {
+    .catch((error) => {
       alert("Le produit n'a pu être affiché.\nVeuillez revenir ultérieurement. ");
       console.error(error);
     });
 }
 
-//EVENT LISTENERS
+//|||||||||||
+//|LISTENERS|
+//|||||||||||
+
 submitSelector.addEventListener("click", (e) => {
   e.preventDefault();
 
@@ -231,7 +238,6 @@ submitSelector.addEventListener("click", (e) => {
         "email": emailSelector.value
       },
       products: []
-
     };
 
 
@@ -257,7 +263,7 @@ submitSelector.addEventListener("click", (e) => {
 
         const orderId = data.orderId;
         const url = "./confirmation.html?orderId=" + orderId;
-        window.location = url;       
+        window.location = url;
 
       })
       .catch(function (error) {
@@ -266,9 +272,9 @@ submitSelector.addEventListener("click", (e) => {
 
 
   } else {
-    //ANNULER L ENVOI ETC
+    //ANNULER L ENVOI 
   }
 });
 
 //FUNCTION CALLS
-getProduct();
+fetchSofaDetails();
