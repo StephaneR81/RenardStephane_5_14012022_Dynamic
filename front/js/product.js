@@ -4,6 +4,8 @@
 //|VARIABLES|
 //|||||||||||
 
+const productId = getProductID();
+
 //Element selectors
 const imgSelector = document.querySelector(".item__img");
 const nameSelector = document.querySelector("#title");
@@ -68,7 +70,7 @@ function getProductID() {
 
 //Returns the API URL for the current product (String).
 function getProductURL() {
-    const productURL = `http://localhost:3000/api/products/${getProductID()}`;
+    const productURL = `http://localhost:3000/api/products/${productId}`;
     return productURL;
 }
 
@@ -109,6 +111,7 @@ function addToBasket(item) {
 
 //Adds a "CLICK" listener to the "ADD TO CART" button.
 submitSelector.addEventListener("click", () => {
+
     if (isValidColor() && isValidQuantity()) {
         const color = colorSelector.options[colorSelector.selectedIndex].value;
         const quantity = quantitySelector.value;
@@ -124,7 +127,7 @@ submitSelector.addEventListener("click", () => {
     } else {
         alert("Vérifiez votre saisie");
     }
-})
+});
 
 //Function call, to fetch product informations.
 fetchSofaDetails();
