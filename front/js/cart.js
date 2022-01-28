@@ -4,6 +4,8 @@
 //|VARIABLES|
 //|||||||||||
 
+let inputQuantitySelector;
+
 const productId = getProductID();
 
 const errorMsgColor = "red";
@@ -53,12 +55,6 @@ function getProductURL() {
   return productURL;
 }
 
-//Returns basket from local storage, or false.
-function getBasket() {
-  let basket = localStorage.getItem("basket");
-  return basket !== null ? JSON.parse(basket) : false;
-}
-
 //Creates and prints the sofa card from basket element.
 function createSofaCard(productDetails) {
   const basket = getBasket();
@@ -102,11 +98,16 @@ function createSofaCard(productDetails) {
 
   const inputQuantity = document.createElement("input");
   inputQuantity.type = "number";
-  inputQuantity.classList = "itemQuantity";
+  inputQuantity.setAttribute("class", "itemQuantity");
   inputQuantity.name = "itemQuantity";
   inputQuantity.min = "1";
   inputQuantity.max = "100";
   inputQuantity.value = basket.quantity;
+  inputQuantity.onchange = () => {
+    updateBasketQuantity(inputQuantity.value);
+    printTotalPrice(productDetails);
+    printTotalQuantity(quantityValueElement);
+  };
 
   const deleteElement = document.createElement("div");
   deleteElement.classList = "cart__item__content__settings__delete";
@@ -132,6 +133,16 @@ function createSofaCard(productDetails) {
 }
 
 //FORMULAR RELATED FUNCTIONS
+
+//Checks quantity input. Returns boolean.
+function checkQuantityInput(inputValue) {
+  const value = Number(inputValue);
+  if (value < 1 || value > 100 || isNaN(value) || value === "" || value === null || !Number.isInteger(value)) {
+    return false;
+  }
+  return true;
+}
+
 //Checks firstName formular field. Returns boolean.
 function checkFirstName() {
   const firstNameRegEx = new RegExp("^[A-Za-zéèëêàçüû\-]{1,30}$");
@@ -201,20 +212,34 @@ function isValidFormular() {
   return false;
 }
 
+//Returns basket from local storage, or false.
+function getBasket() {
+  let basket = localStorage.getItem("basket");
+  return basket !== null ? JSON.parse(basket) : false;
+}
+
+//Adds basket to local storage.
+function storeBasket(item) {
+  localStorage.setItem("basket", JSON.stringify(item));
+}
+
 //Updates item quantity in basket.
 function updateBasketQuantity(newQuantity) {
-  let basket = getBasket();
-  basket.quantity = newQuantity;
-  storeBasket(basket);
+  if (checkQuantityInput(newQuantity)) {
+    let basket = getBasket();
+    basket.quantity = newQuantity;
+    storeBasket(basket);
+  }
 }
 
 //Prints total price.
-function printTotalPrice() {
-  totalPriceSelector.textContent = basketTotalPrice();
+function printTotalPrice(fetchedData) {
+  totalPriceSelector.textContent = basketTotalPrice(fetchedData);
 }
 
 //Prints total items quantity
-function printTotalQuantity() {
+function printTotalQuantity(selector) {
+  selector.textContent = "Qté : " + basketTotalItems();
   totalQuantitySelector.textContent = basketTotalItems();
 }
 
@@ -324,6 +349,9 @@ function fetchSofaDetails() {
 //|||||||||||
 //|LISTENERS|
 //|||||||||||
+
+
+
 
 submitSelector.addEventListener("click", (e) => {
   e.preventDefault();
