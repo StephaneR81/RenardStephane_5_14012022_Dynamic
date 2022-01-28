@@ -103,7 +103,7 @@ function createSofaCard(productDetails) {
   inputQuantity.min = "1";
   inputQuantity.max = "100";
   inputQuantity.value = basket.quantity;
-  inputQuantity.onchange = () => {
+  inputQuantity.onchange = () => { //Dynamically updates price/quantity on change.
     updateBasketQuantity(inputQuantity.value);
     printTotalPrice(productDetails);
     printTotalQuantity(quantityValueElement);
@@ -114,6 +114,9 @@ function createSofaCard(productDetails) {
 
   const deleteItemElement = document.createElement("p");
   deleteItemElement.textContent = "Supprimer";
+  deleteElement.addEventListener("click", () => {
+    deleteElement.closest("article").remove(); // Removes the deleted product from the page.
+  });
 
   //Appends HTML previously created elements.
   cartItemsSelector.append(itemElement);

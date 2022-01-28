@@ -5,7 +5,6 @@ const ProductsURL = "http://localhost:3000/api/products";
 const itemsSection = document.querySelector("#items");
 
 
-
 //FUNCTIONS
 
 //CREATES A PRODUCT CARD

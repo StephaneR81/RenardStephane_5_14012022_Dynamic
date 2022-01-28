@@ -1,12 +1,22 @@
-//VARIABLES
+//KANAP CONFIRMATION PAGE SCRIPT
 
-
-// GETTING ORDER ID FROM URL
-let params = new URLSearchParams(window.location.search);
-const orderId = params.has("orderId") ? params.get("orderId") : null;
-
+//|||||||||||
+//|VARIABLES|
+//|||||||||||
 const orderIdSelector = document.querySelector("#orderId");
 
-if (orderId !== null) {
-    orderIdSelector.textContent = orderId;
+//|||||||||||
+//|FUNCTIONS|
+//|||||||||||
+
+//Returns the order ID from URL (String), or a string information.
+function getOrderID() {
+    let params = new URLSearchParams(window.location.search);
+    return params.has("orderId") ? params.get("orderId") : "Numéro de commande indisponible";
 }
+
+//Prints the order ID 
+orderIdSelector.textContent = getOrderID();
+
+//Clears the local storage.
+// localStorage.clear();
