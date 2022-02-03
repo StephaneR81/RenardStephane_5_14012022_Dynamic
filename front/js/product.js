@@ -88,22 +88,33 @@ function isValidColor() {
 }
 
 //BASKET RELATED FUNCTIONS
-//Adds basket to local storage.
-function storeBasket(item) {
-    localStorage.setItem("basket", JSON.stringify(item));
-}
-
 //Gets basket from local storage.
 function getBasket() {
     let basket = localStorage.getItem("basket");
-    return (basket !== null) ? JSON.parse(basket) : new Array(); //Creates basket if not.
+    return (basket !== null) ? JSON.parse(basket) : []; //Creates basket if not.
 }
 
-//Adds items to basket
+//Adds item to basket
 function addToBasket(item) {
     let basket = getBasket();
-    storeBasket(item);
+    let itemIndexFound = basket.findIndex(itemObj => itemObj.id === item.id && itemObj.color === item.color); // Returns the found item index in basket, or -1 if not found.
+
+    if (itemIndexFound !== -1) { // If an existing item has been found, sets the current item new quantity, removes the old item object from basket and adds the new one.
+        const newQuantity = Number(basket[itemIndexFound].quantity) + Number(item.quantity);
+        item.quantity = newQuantity;
+        basket.splice(itemIndexFound, 1, item);
+    } else {
+        basket.push(item);
+    }
+    storeBasket(basket);
 }
+
+//Adds basket to local storage.
+function storeBasket(basket) {
+    localStorage.setItem("basket", JSON.stringify(basket));
+}
+
+
 
 //|||||||||||
 //|LISTENERS|
@@ -123,7 +134,7 @@ submitSelector.addEventListener("click", () => {
         };
 
         addToBasket(item);
-        window.location.href = "./cart.html?id=" + productId;
+        window.location.href = "./cart.html";
     } else {
         alert("Vérifiez votre saisie");
     }
