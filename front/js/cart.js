@@ -6,8 +6,6 @@
 
 let inputQuantitySelector;
 
-const productId = getProductID();
-
 const errorMsgColor = "red";
 const inputErrorMsg = "Veuillez vérifier la saisie du champ ci-dessus";
 
@@ -43,27 +41,40 @@ const submitSelector = document.querySelector("#order");
 //|FUNCTIONS|
 //|||||||||||
 
-//Returns the current product ID from URL (String), or null.
-function getProductID() {
-  let params = new URLSearchParams(window.location.search);
-  return params.has("id") ? params.get("id") : null;
-}
+//Fetches each product informations from API
+function fetchItemPrice() {
 
-//Returns the API URL for the current product (String).
-function getProductURL() {
-  const productURL = `http://localhost:3000/api/products/${productId}`;
-  return productURL;
+  const basket = getBasket();
+
+  for (const key in basket) {
+
+    fetch(`http://localhost:3000/api/products/${basket[key].id}`)
+
+      .then((response) => {
+        return response.json();
+      })
+
+      .then((productDetails) => {
+        createSofaCard(productDetails);
+      })
+
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 }
 
 //Creates and prints the sofa card from basket element.
 function createSofaCard(productDetails) {
-  const basket = getBasket();
+  let basket = getBasket();
+
+  const basketProductDetails = basket.find((element) => element.id == productDetails._id);
 
   //Creating card HTML elements.
   const itemElement = document.createElement("article");
   itemElement.classList = "cart__item";
-  itemElement.setAttribute("data-id", productId);
-  itemElement.setAttribute("data-color", basket.color);
+  itemElement.setAttribute("data-id", productDetails._id);
+  itemElement.setAttribute("data-color", basketProductDetails.color);
 
   const itemImgElement = document.createElement("div");
   itemImgElement.classList = "cart__item__img";
@@ -82,7 +93,7 @@ function createSofaCard(productDetails) {
   nameElement.textContent = productDetails.name;
 
   const colorElement = document.createElement("p");
-  colorElement.textContent = basket.color;
+  colorElement.textContent = basketProductDetails.color;
 
   const priceElement = document.createElement("p");
   priceElement.textContent = productDetails.price + " €";
@@ -94,7 +105,10 @@ function createSofaCard(productDetails) {
   quantityElement.classList = "cart__item__content__settings__quantity";
 
   const quantityValueElement = document.createElement("p");
-  quantityValueElement.textContent = "Qté : " + basket.quantity;
+  quantityValueElement.textContent = "Qté : " + basketProductDetails.quantity;
+
+  totalQuantitySelector.textContent = basketTotalItems();
+  // printTotalPrice();
 
   const inputQuantity = document.createElement("input");
   inputQuantity.type = "number";
@@ -102,11 +116,15 @@ function createSofaCard(productDetails) {
   inputQuantity.name = "itemQuantity";
   inputQuantity.min = "1";
   inputQuantity.max = "100";
-  inputQuantity.value = basket.quantity;
+  inputQuantity.value = basketProductDetails.quantity;
   inputQuantity.onchange = () => { //Dynamically updates price/quantity on change.
-    updateBasketQuantity(inputQuantity.value);
-    printTotalPrice(productDetails);
-    printTotalQuantity(quantityValueElement);
+
+    if (checkQuantityInput(inputQuantity.value)) {
+      addToBasket(basketProductDetails, inputQuantity.value);
+      quantityValueElement.textContent = "Qté : " + basketProductDetails.quantity;
+      printTotalQuantity();
+      printTotalPrice();
+    }
   };
 
   const deleteElement = document.createElement("div");
@@ -114,8 +132,8 @@ function createSofaCard(productDetails) {
 
   const deleteItemElement = document.createElement("p");
   deleteItemElement.textContent = "Supprimer";
-  deleteElement.addEventListener("click", () => {
-    deleteElement.closest("article").remove(); // Removes the deleted product from the page.
+  deleteElement.addEventListener("click", () => { // Removes the deleted product from the page.
+    //  deleteElement.closest("article").remove(); 
   });
 
   //Appends HTML previously created elements.
@@ -133,6 +151,7 @@ function createSofaCard(productDetails) {
   quantityElement.append(inputQuantity);
   settingsElement.append(deleteElement);
   deleteElement.append(deleteItemElement);
+
 }
 
 //FORMULAR RELATED FUNCTIONS
@@ -221,43 +240,49 @@ function getBasket() {
   return basket !== null ? JSON.parse(basket) : false;
 }
 
-//Adds basket to local storage.
-function storeBasket(item) {
-  localStorage.setItem("basket", JSON.stringify(item));
+//Adds item to basket
+function addToBasket(item, newQuantity) {
+  let basket = getBasket();
+  let itemIndexFound = basket.findIndex(itemObj => itemObj.id === item.id && itemObj.color === item.color); // Returns the found item index in basket, or -1 if not found.
+
+  if (itemIndexFound !== -1) { // If an existing item has been found, sets the current item new quantity, removes the old item object from basket and adds the new one.
+    item.quantity = Number(newQuantity);
+    basket.splice(itemIndexFound, 1, item);
+  } else {
+    basket.push(item);
+  }
+  storeBasket(basket);
 }
 
-//Updates item quantity in basket.
-function updateBasketQuantity(newQuantity) {
-  if (checkQuantityInput(newQuantity)) {
-    let basket = getBasket();
-    basket.quantity = newQuantity;
-    storeBasket(basket);
-  }
+//Adds basket to local storage.
+function storeBasket(basket) {
+  localStorage.setItem("basket", JSON.stringify(basket));
 }
+
 
 //Prints total price.
-function printTotalPrice(fetchedData) {
-  totalPriceSelector.textContent = basketTotalPrice(fetchedData);
+function printTotalPrice() {
+  // totalPriceSelector.textContent = basketTotalPrice(itemUnitPrice);
 }
 
 //Prints total items quantity
-function printTotalQuantity(selector) {
-  selector.textContent = "Qté : " + basketTotalItems();
+function printTotalQuantity() {
   totalQuantitySelector.textContent = basketTotalItems();
 }
 
 //Returns the total of all items in basket. (Number)
 function basketTotalItems() {
-  const basket = getBasket();
-  return Number(basket.quantity);
+  let basket = getBasket();
+  let totalQuantity = 0;
+  for (const key in basket) {
+    totalQuantity += Number(basket[key].quantity);
+  }
+  return totalQuantity;
 }
 
 //Returns the total price of the order. (Number)
-function basketTotalPrice(fetchedData) {
-  const basket = getBasket();
-  const quantity = Number(basket.quantity);
-  const unitPrice = Number(fetchedData.price);
-  return quantity * unitPrice;
+function basketTotalPrice() {
+
 }
 
 //Returns a "contact" object.
@@ -329,32 +354,11 @@ function sendOrder() {
     });
 }
 
-//Fetches informations from API for one product.
-function fetchSofaDetails() {
-  fetch(getProductURL())
 
-    .then((response) => {
-      return response.json();
-    })
-
-    .then((productDetails) => {
-      createSofaCard(productDetails);
-      totalQuantitySelector.textContent = basketTotalItems().toString();
-      totalPriceSelector.textContent = basketTotalPrice(productDetails).toString();
-    })
-
-    .catch((error) => {
-      alert("Le produit n'a pu être affiché.\nVeuillez revenir ultérieurement. ");
-      console.error(error);
-    });
-}
 
 //|||||||||||
 //|LISTENERS|
 //|||||||||||
-
-
-
 
 submitSelector.addEventListener("click", (e) => {
   e.preventDefault();
@@ -363,5 +367,6 @@ submitSelector.addEventListener("click", (e) => {
   }
 });
 
-//FUNCTION CALLS
-fetchSofaDetails();
+
+// FUNCTION CALL
+fetchItemPrice();

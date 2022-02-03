@@ -101,7 +101,7 @@ function addToBasket(item) {
 
     if (itemIndexFound !== -1) { // If an existing item has been found, sets the current item new quantity, removes the old item object from basket and adds the new one.
         const newQuantity = Number(basket[itemIndexFound].quantity) + Number(item.quantity);
-        item.quantity = newQuantity;
+        item.quantity = Number(newQuantity);
         basket.splice(itemIndexFound, 1, item);
     } else {
         basket.push(item);
@@ -125,7 +125,7 @@ submitSelector.addEventListener("click", () => {
 
     if (isValidColor() && isValidQuantity()) {
         const color = colorSelector.options[colorSelector.selectedIndex].value;
-        const quantity = quantitySelector.value;
+        const quantity = Number(quantitySelector.value);
 
         const item = {
             id: productId,
