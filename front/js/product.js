@@ -126,11 +126,19 @@ submitSelector.addEventListener("click", () => {
     if (isValidColor() && isValidQuantity()) {
         const color = colorSelector.options[colorSelector.selectedIndex].value;
         const quantity = Number(quantitySelector.value);
+        const name = nameSelector.textContent;
+        const url = document.querySelector(".item__img img").src;
+        const price = priceSelector.textContent;
+        const altTxt = document.querySelector(".item__img img").alt;
 
         const item = {
             id: productId,
             color: color,
-            quantity: quantity
+            quantity: quantity,
+            name: name,
+            imageUrl: url,
+            price : price,
+            altTxt: altTxt
         };
 
         addToBasket(item);

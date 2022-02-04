@@ -37,121 +37,110 @@ emailErrorMsgSelector.style.color = errorMsgColor;
 
 const submitSelector = document.querySelector("#order");
 
+
+
 //|||||||||||
 //|FUNCTIONS|
 //|||||||||||
 
-//Fetches each product informations from API
-function fetchItemPrice() {
 
-  const basket = getBasket();
-
-  for (const key in basket) {
-
-    fetch(`http://localhost:3000/api/products/${basket[key].id}`)
-
-      .then((response) => {
-        return response.json();
-      })
-
-      .then((productDetails) => {
-        createSofaCard(productDetails);
-      })
-
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-}
-
+createSofaCard();
 //Creates and prints the sofa card from basket element.
-function createSofaCard(productDetails) {
+
+function createSofaCard() {
   let basket = getBasket();
 
-  const basketProductDetails = basket.find((element) => element.id == productDetails._id);
+  for (const key in basket) {
+    //Creating card HTML elements.
+    const itemElement = document.createElement("article");
+    itemElement.classList = "cart__item";
+    itemElement.setAttribute("data-id", basket[key].id);
+    itemElement.setAttribute("data-color", basket[key].color);
 
-  //Creating card HTML elements.
-  const itemElement = document.createElement("article");
-  itemElement.classList = "cart__item";
-  itemElement.setAttribute("data-id", productDetails._id);
-  itemElement.setAttribute("data-color", basketProductDetails.color);
+    const itemImgElement = document.createElement("div");
+    itemImgElement.classList = "cart__item__img";
 
-  const itemImgElement = document.createElement("div");
-  itemImgElement.classList = "cart__item__img";
+    const imgElement = document.createElement("img");
+    imgElement.src = basket[key].imageUrl;
+    imgElement.alt = basket[key].altTxt + ", " + basket[key].name;
 
-  const imgElement = document.createElement("img");
-  imgElement.src = productDetails.imageUrl;
-  imgElement.alt = productDetails.altTxt + ", " + productDetails.name;
+    const itemContentElement = document.createElement("div");
+    itemContentElement.classList = "cart__item__content";
 
-  const itemContentElement = document.createElement("div");
-  itemContentElement.classList = "cart__item__content";
+    const contentDescriptionElement = document.createElement("div");
+    contentDescriptionElement.classList = "cart__item__content__description";
 
-  const contentDescriptionElement = document.createElement("div");
-  contentDescriptionElement.classList = "cart__item__content__description";
+    const nameElement = document.createElement("h2");
+    nameElement.textContent = basket[key].name;
 
-  const nameElement = document.createElement("h2");
-  nameElement.textContent = productDetails.name;
+    const colorElement = document.createElement("p");
+    colorElement.textContent = basket[key].color;
 
-  const colorElement = document.createElement("p");
-  colorElement.textContent = basketProductDetails.color;
+    const priceElement = document.createElement("p");
+    priceElement.textContent = basket[key].price + " €";
 
-  const priceElement = document.createElement("p");
-  priceElement.textContent = productDetails.price + " €";
+    const settingsElement = document.createElement("div");
+    settingsElement.classList = "cart__item__content__settings";
 
-  const settingsElement = document.createElement("div");
-  settingsElement.classList = "cart__item__content__settings";
+    const quantityElement = document.createElement("div");
+    quantityElement.classList = "cart__item__content__settings__quantity";
 
-  const quantityElement = document.createElement("div");
-  quantityElement.classList = "cart__item__content__settings__quantity";
+    const quantityValueElement = document.createElement("p");
+    quantityValueElement.textContent = "Qté : " + basket[key].quantity;
 
-  const quantityValueElement = document.createElement("p");
-  quantityValueElement.textContent = "Qté : " + basketProductDetails.quantity;
+    totalQuantitySelector.textContent = basketTotalItems();
+    printTotalPrice();
 
-  totalQuantitySelector.textContent = basketTotalItems();
-  // printTotalPrice();
+    const inputQuantity = document.createElement("input");
+    inputQuantity.type = "number";
+    inputQuantity.setAttribute("class", "itemQuantity");
+    inputQuantity.name = "itemQuantity";
+    inputQuantity.min = "1";
+    inputQuantity.max = "100";
+    inputQuantity.value = basket[key].quantity;
+    inputQuantity.addEventListener("change", () => {
+      if (checkQuantityInput(inputQuantity.value)) { //Dynamically updates price/quantity on change.
+        addToBasket(basket[key], inputQuantity.value);
+        quantityValueElement.textContent = "Qté : " + basket[key].quantity;
+        printTotalQuantity();
+        printTotalPrice();
+      };
+    });
 
-  const inputQuantity = document.createElement("input");
-  inputQuantity.type = "number";
-  inputQuantity.setAttribute("class", "itemQuantity");
-  inputQuantity.name = "itemQuantity";
-  inputQuantity.min = "1";
-  inputQuantity.max = "100";
-  inputQuantity.value = basketProductDetails.quantity;
-  inputQuantity.onchange = () => { //Dynamically updates price/quantity on change.
+    const deleteElement = document.createElement("div");
+    deleteElement.classList = "cart__item__content__settings__delete";
 
-    if (checkQuantityInput(inputQuantity.value)) {
-      addToBasket(basketProductDetails, inputQuantity.value);
-      quantityValueElement.textContent = "Qté : " + basketProductDetails.quantity;
+    const deleteItemElement = document.createElement("p");
+    deleteItemElement.textContent = "Supprimer";
+    deleteElement.addEventListener("click", (e) => { // Removes the deleted product from the page.
+
+      const closestArticle = deleteElement.closest("article"); //Getting the the first article parent element.
+      const itemToDeleteId = closestArticle.getAttribute("data-id"); //Getting the item ID from attribute "data-id" of the parent article element.
+      const itemToDeleteColor = closestArticle.childNodes[1].childNodes[0].childNodes[1].textContent; //Getting the color of the item to delete
+
+      removeFromBasket(itemToDeleteId, itemToDeleteColor);
+      closestArticle.remove();
       printTotalQuantity();
       printTotalPrice();
-    }
-  };
 
-  const deleteElement = document.createElement("div");
-  deleteElement.classList = "cart__item__content__settings__delete";
+    });
 
-  const deleteItemElement = document.createElement("p");
-  deleteItemElement.textContent = "Supprimer";
-  deleteElement.addEventListener("click", () => { // Removes the deleted product from the page.
-    //  deleteElement.closest("article").remove(); 
-  });
-
-  //Appends HTML previously created elements.
-  cartItemsSelector.append(itemElement);
-  itemElement.append(itemImgElement);
-  itemImgElement.append(imgElement);
-  itemElement.append(itemContentElement);
-  itemContentElement.append(contentDescriptionElement);
-  contentDescriptionElement.append(nameElement);
-  contentDescriptionElement.append(colorElement);
-  contentDescriptionElement.append(priceElement);
-  itemContentElement.append(settingsElement);
-  settingsElement.append(quantityElement);
-  quantityElement.append(quantityValueElement);
-  quantityElement.append(inputQuantity);
-  settingsElement.append(deleteElement);
-  deleteElement.append(deleteItemElement);
-
+    //Appends HTML previously created elements.
+    cartItemsSelector.append(itemElement);
+    itemElement.append(itemImgElement);
+    itemImgElement.append(imgElement);
+    itemElement.append(itemContentElement);
+    itemContentElement.append(contentDescriptionElement);
+    contentDescriptionElement.append(nameElement);
+    contentDescriptionElement.append(colorElement);
+    contentDescriptionElement.append(priceElement);
+    itemContentElement.append(settingsElement);
+    settingsElement.append(quantityElement);
+    quantityElement.append(quantityValueElement);
+    quantityElement.append(inputQuantity);
+    settingsElement.append(deleteElement);
+    deleteElement.append(deleteItemElement);
+  }
 }
 
 //FORMULAR RELATED FUNCTIONS
@@ -254,6 +243,17 @@ function addToBasket(item, newQuantity) {
   storeBasket(basket);
 }
 
+//Removes an item from basket.
+function removeFromBasket(itemId, itemColor) {
+  let basket = getBasket();
+  const itemIdToRemove = basket.findIndex((element) => element.id === itemId && element.color === itemColor);
+  if (itemIdToRemove !== -1) {
+
+    basket.splice(itemIdToRemove, 1);
+  }
+  storeBasket(basket);
+}
+
 //Adds basket to local storage.
 function storeBasket(basket) {
   localStorage.setItem("basket", JSON.stringify(basket));
@@ -262,7 +262,7 @@ function storeBasket(basket) {
 
 //Prints total price.
 function printTotalPrice() {
-  // totalPriceSelector.textContent = basketTotalPrice(itemUnitPrice);
+  totalPriceSelector.textContent = basketTotalPrice();
 }
 
 //Prints total items quantity
@@ -282,7 +282,12 @@ function basketTotalItems() {
 
 //Returns the total price of the order. (Number)
 function basketTotalPrice() {
-
+  let basket = getBasket();
+  let price = 0;
+  for (const key in basket) {
+    price += (Number(basket[key].quantity) * Number(basket[key].price));
+  }
+  return price;
 }
 
 //Returns a "contact" object.
@@ -297,17 +302,17 @@ function createContact() {
   return contact;
 }
 
-//Returns an "order" array representing items to purchase.
+//Returns an "order" array representing items to purchase or false if empty.
 function createOrder() {
   const basket = getBasket();
   let products = [];
+
   for (const key in basket) {
-    if ((key == "id") && (typeof basket.id === "string")) {
-      products.push(basket.id);
-    }
+    products.push(basket[key].id);
   }
-  return products;
+  return products.length > 0 ? products : false;
 }
+
 
 //Returns a stringified "body" (contact + order) for sending to API
 function getBody() {
@@ -318,7 +323,8 @@ function getBody() {
     contact,
     products
   };
-  return JSON.stringify(body);
+
+  return products !== false ? JSON.stringify(body) : false;
 }
 
 //Redirects the customer on confirmation page
@@ -330,6 +336,10 @@ function redirectConfirmation(orderId) {
 function sendOrder() {
   const orderUrl = "http://localhost:3000/api/products/order";
 
+  if (!getBody()) {
+    alert("Votre panier est vide, veuillez d'abord ajouter un article");
+    return;
+  }
   const headers = {
     method: "POST",
     headers: {
@@ -369,4 +379,3 @@ submitSelector.addEventListener("click", (e) => {
 
 
 // FUNCTION CALL
-fetchItemPrice();

@@ -19,4 +19,4 @@ function getOrderID() {
 orderIdSelector.textContent = getOrderID();
 
 //Clears the local storage.
-// localStorage.clear();
+localStorage.clear();
