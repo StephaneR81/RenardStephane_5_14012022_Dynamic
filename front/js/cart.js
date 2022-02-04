@@ -43,11 +43,11 @@ const submitSelector = document.querySelector("#order");
 //|FUNCTIONS|
 //|||||||||||
 
-
 createSofaCard();
-//Creates and prints the sofa card from basket element.
 
+//Creates and prints the sofa card from basket element.
 function createSofaCard() {
+
   let basket = getBasket();
 
   for (const key in basket) {
@@ -88,8 +88,6 @@ function createSofaCard() {
     const quantityValueElement = document.createElement("p");
     quantityValueElement.textContent = "Qté : " + basket[key].quantity;
 
-    totalQuantitySelector.textContent = basketTotalItems();
-    printTotalPrice();
 
     const inputQuantity = document.createElement("input");
     inputQuantity.type = "number";
@@ -112,17 +110,14 @@ function createSofaCard() {
 
     const deleteItemElement = document.createElement("p");
     deleteItemElement.textContent = "Supprimer";
-    deleteElement.addEventListener("click", (e) => { // Removes the deleted product from the page.
-
+    deleteElement.addEventListener("click", () => { // Removes the deleted product from the page.
       const closestArticle = deleteElement.closest("article"); //Getting the the first article parent element.
       const itemToDeleteId = closestArticle.getAttribute("data-id"); //Getting the item ID from attribute "data-id" of the parent article element.
       const itemToDeleteColor = closestArticle.childNodes[1].childNodes[0].childNodes[1].textContent; //Getting the color of the item to delete
-
       removeFromBasket(itemToDeleteId, itemToDeleteColor);
       closestArticle.remove();
       printTotalQuantity();
       printTotalPrice();
-
     });
 
     //Appends HTML previously created elements.
@@ -141,6 +136,8 @@ function createSofaCard() {
     settingsElement.append(deleteElement);
     deleteElement.append(deleteItemElement);
   }
+  totalQuantitySelector.textContent = basketTotalItems();
+  printTotalPrice();
 }
 
 //FORMULAR RELATED FUNCTIONS
@@ -281,11 +278,31 @@ function basketTotalItems() {
 }
 
 //Returns the total price of the order. (Number)
+// function basketTotalPrice() {
+//   let basket = getBasket();
+//   let price = 0;
+//   for (const key in basket) {
+//     price += (Number(basket[key].quantity) * Number(basket[key].price));
+//   }
+//   return price;
+// }
+
+//Returns the total price of the order. (Number)
 function basketTotalPrice() {
-  let basket = getBasket();
+  let prices = [];
   let price = 0;
-  for (const key in basket) {
-    price += (Number(basket[key].quantity) * Number(basket[key].price));
+  const articles = document.querySelectorAll(".cart__item");
+  for (const article of articles) {
+    let itemPrice = article.childNodes[1].childNodes[0].childNodes[2].textContent;
+    let itemQuantity = article.childNodes[1].childNodes[1].childNodes[0].textContent;
+    itemPrice = itemPrice.slice(0, -2);
+    itemQuantity = itemQuantity.substring(6);
+    itemPrice = Number(itemPrice);
+    itemQuantity = Number(itemQuantity);
+    prices.push(itemPrice * itemQuantity);
+  }
+  for (iteratedPrice of prices) {
+    price += iteratedPrice;
   }
   return price;
 }
@@ -314,7 +331,7 @@ function createOrder() {
 }
 
 
-//Returns a stringified "body" (contact + order) for sending to API
+//Returns a stringified "body" (contact + order) for sending to API, or false if "products" is empty.
 function getBody() {
   const contact = createContact();
   const products = createOrder();
