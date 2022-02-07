@@ -43,11 +43,40 @@ const submitSelector = document.querySelector("#order");
 //|FUNCTIONS|
 //|||||||||||
 
+
+//Returns pricesObj associating an item ID with its unit price fetched from API.
+async function getPrices() {
+  const pricesObj = new Map();
+  const prices = await fetchPrices();
+
+  for (const iterator of prices) {
+    pricesObj.set(iterator._id, iterator.price);
+  }
+  return pricesObj;
+}
+
+//Fetches all products informations from API.
+async function fetchPrices() {
+  return fetch("http://localhost:3000/api/products")
+
+    .then((response) => {
+      return response.json();
+    })
+
+    .then((prices) => {
+      return prices;
+    })
+
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
 createSofaCard();
 
 //Creates and prints the sofa card from basket element.
-function createSofaCard() {
-
+async function createSofaCard() {
+  const pricesObj = await getPrices();
   let basket = getBasket();
 
   for (const key in basket) {
@@ -77,7 +106,8 @@ function createSofaCard() {
     colorElement.textContent = basket[key].color;
 
     const priceElement = document.createElement("p");
-    priceElement.textContent = basket[key].price + " €";
+    // priceElement.textContent = basket[key].price + " €";
+    priceElement.textContent = pricesObj.get(basket[key].id) + " €";
 
     const settingsElement = document.createElement("div");
     settingsElement.classList = "cart__item__content__settings";
@@ -96,8 +126,8 @@ function createSofaCard() {
     inputQuantity.min = "1";
     inputQuantity.max = "100";
     inputQuantity.value = basket[key].quantity;
-    inputQuantity.addEventListener("change", () => {
-      if (checkQuantityInput(inputQuantity.value)) { //Dynamically updates price/quantity on change.
+    inputQuantity.addEventListener("change", () => { //Dynamically updates price/quantity on change.
+      if (checkQuantityInput(inputQuantity.value)) {
         addToBasket(basket[key], inputQuantity.value);
         quantityValueElement.textContent = "Qté : " + basket[key].quantity;
         printTotalQuantity();
@@ -258,8 +288,8 @@ function storeBasket(basket) {
 
 
 //Prints total price.
-function printTotalPrice() {
-  totalPriceSelector.textContent = basketTotalPrice();
+async function printTotalPrice() {
+  totalPriceSelector.textContent = await basketTotalPrice();
 }
 
 //Prints total items quantity
@@ -278,33 +308,18 @@ function basketTotalItems() {
 }
 
 //Returns the total price of the order. (Number)
-// function basketTotalPrice() {
-//   let basket = getBasket();
-//   let price = 0;
-//   for (const key in basket) {
-//     price += (Number(basket[key].quantity) * Number(basket[key].price));
-//   }
-//   return price;
-// }
+async function basketTotalPrice() {
+  let pricesObj = await getPrices();
+  let basket = getBasket();
+  let totalPrice = 0;
 
-//Returns the total price of the order. (Number)
-function basketTotalPrice() {
-  let prices = [];
-  let price = 0;
-  const articles = document.querySelectorAll(".cart__item");
-  for (const article of articles) {
-    let itemPrice = article.childNodes[1].childNodes[0].childNodes[2].textContent;
-    let itemQuantity = article.childNodes[1].childNodes[1].childNodes[0].textContent;
-    itemPrice = itemPrice.slice(0, -2);
-    itemQuantity = itemQuantity.substring(6);
-    itemPrice = Number(itemPrice);
-    itemQuantity = Number(itemQuantity);
-    prices.push(itemPrice * itemQuantity);
+  for (const key in basket) {
+    const itemId = basket[key].id;
+    let itemUnitPrice = pricesObj.get(itemId);
+    itemUnitPrice = Number(itemUnitPrice);
+    totalPrice += (Number(basket[key].quantity) * itemUnitPrice);
   }
-  for (iteratedPrice of prices) {
-    price += iteratedPrice;
-  }
-  return price;
+  return totalPrice;
 }
 
 //Returns a "contact" object.

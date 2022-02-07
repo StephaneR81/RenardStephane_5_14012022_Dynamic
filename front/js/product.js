@@ -128,7 +128,6 @@ submitSelector.addEventListener("click", () => {
         const quantity = Number(quantitySelector.value);
         const name = nameSelector.textContent;
         const url = document.querySelector(".item__img img").src;
-        const price = priceSelector.textContent;
         const altTxt = document.querySelector(".item__img img").alt;
 
         const item = {
@@ -137,7 +136,6 @@ submitSelector.addEventListener("click", () => {
             quantity: quantity,
             name: name,
             imageUrl: url,
-            price : price,
             altTxt: altTxt
         };
 
