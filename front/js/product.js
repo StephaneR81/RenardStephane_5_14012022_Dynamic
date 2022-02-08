@@ -34,6 +34,7 @@ function fetchSofaDetails() {
             (sofa) => {
                 createSofaCard(sofa);
                 quantitySelector.value = 1;
+                document.title = sofa.name;
             })
 
         .catch(

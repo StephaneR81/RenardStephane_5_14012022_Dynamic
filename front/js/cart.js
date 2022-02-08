@@ -183,7 +183,6 @@ function checkQuantityInput(inputValue) {
 function checkFirstName() {
   const firstNameRegEx = new RegExp("^[A-Za-zéèëêàçüû\-]{1,30}$");
   if (!firstNameRegEx.test(firstNameSelector.value)) {
-    firstNameErrorMsgSelector.textContent = inputErrorMsg;
     return false;
   }
   firstNameErrorMsgSelector.textContent = "";
@@ -194,7 +193,6 @@ function checkFirstName() {
 function checkLastname() {
   const lastNameRegEx = new RegExp("^[A-Za-zéèëêàçüû\-]{1,30}$");
   if (!lastNameRegEx.test(lastNameSelector.value)) {
-    lastNameErrorMsgSelector.textContent = inputErrorMsg;
     return false;
   }
   lastNameErrorMsgSelector.textContent = "";
@@ -207,7 +205,6 @@ function checkAddress() {
   if ((!addressRegEx.test(addressSelector.value)) ||
     (addressSelector.value === "") ||
     (addressSelector.value === null)) {
-    addressErrorMsgSelector.textContent = inputErrorMsg;
     return false;
   }
   addressErrorMsgSelector.textContent = "";
@@ -218,7 +215,6 @@ function checkAddress() {
 function checkCity() {
   const cityRegEx = new RegExp("^[A-Za-z0-9éèëêàçüû\-]{1,30}$");
   if (!cityRegEx.test(citySelector.value)) {
-    cityErrorMsgSelector.textContent = inputErrorMsg;
     return false;
   }
   cityErrorMsgSelector.textContent = "";
@@ -229,7 +225,6 @@ function checkCity() {
 function checkEmail() {
   const mailRegEx = new RegExp("^[A-Za-z0-9._-]+[@]{1}[a-zA-Z0-9._-]+[.]{1}[a-zA-Z]{2,10}$");
   if (!mailRegEx.test(emailSelector.value)) {
-    emailErrorMsgSelector.textContent = inputErrorMsg;
     return false;
   }
   emailErrorMsgSelector.textContent = "";
@@ -238,14 +233,15 @@ function checkEmail() {
 
 //Checks if the whole formular fields are valid. Returns boolean.
 function isValidFormular() {
-  if (checkFirstName() &&
-    checkLastname() &&
-    checkAddress() &&
-    checkCity() &&
-    checkEmail()) {
-    return true;
+  const isFormValid = checkFirstName() && checkLastname() && checkAddress() && checkCity() && checkEmail();
+  if (!isFormValid) {
+    !checkFirstName() ? firstNameErrorMsgSelector.textContent = inputErrorMsg : null;
+    !checkLastname() ? lastNameErrorMsgSelector.textContent = inputErrorMsg : null;
+    !checkAddress() ? addressErrorMsgSelector.textContent = inputErrorMsg : null;
+    !checkCity() ? cityErrorMsgSelector.textContent = inputErrorMsg : null;
+    !checkEmail() ? emailErrorMsgSelector.textContent = inputErrorMsg : null;
   }
-  return false;
+  return true;
 }
 
 //Returns basket from local storage, or false.
