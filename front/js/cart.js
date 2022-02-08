@@ -4,8 +4,6 @@
 //|VARIABLES|
 //|||||||||||
 
-let inputQuantitySelector;
-
 const errorMsgColor = "red";
 const inputErrorMsg = "Veuillez vérifier la saisie du champ ci-dessus";
 
