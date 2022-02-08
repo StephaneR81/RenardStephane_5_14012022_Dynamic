@@ -194,7 +194,7 @@ function checkFirstName() {
 
 //Checks lastName formular field. Returns boolean.
 function checkLastname() {
-  const lastNameRegEx = new RegExp("^[A-Za-zéèëêàçüû\ \-]{1,30}$");
+  const lastNameRegEx = new RegExp("^[A-Za-zéèëêàçüû\-]{1,30}$");
   if (!lastNameRegEx.test(lastNameSelector.value)) {
     lastNameErrorMsgSelector.textContent = inputErrorMsg;
     return false;
