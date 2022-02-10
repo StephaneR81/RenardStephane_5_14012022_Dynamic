@@ -240,6 +240,7 @@ function isValidFormular() {
     !checkAddress() ? addressErrorMsgSelector.textContent = inputErrorMsg : null;
     !checkCity() ? cityErrorMsgSelector.textContent = inputErrorMsg : null;
     !checkEmail() ? emailErrorMsgSelector.textContent = inputErrorMsg : null;
+    return false;
   }
   return true;
 }
