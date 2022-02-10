@@ -130,7 +130,10 @@ async function createSofaCard() {
         quantityValueElement.textContent = "Qté : " + basket[key].quantity;
         printTotalQuantity();
         printTotalPrice();
-      };
+      } else {
+        inputQuantity.value = 1;
+        alert("Veuillez vérifier la quantité saisie");
+      }
     });
 
     const deleteElement = document.createElement("div");
