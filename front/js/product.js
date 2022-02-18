@@ -118,6 +118,7 @@ function storeBasket(basket) {
 //FIRST FUNCTION TO BE EXECUTED ON SCRIPT LOAD
 async function initialize() {
     await fetchSofaDetails();
+    addToCartListener();
 }
 
 initialize();
@@ -129,36 +130,38 @@ initialize();
 //|||||||||||
 
 //Adds a "CLICK" listener to the "ADD TO CART" button.
-submitSelector.addEventListener("click", () => {
+function addToCartListener() {
+    submitSelector.addEventListener("click", () => {
 
-    if (isValidColor() && isValidQuantity()) {
-        const color = colorSelector.options[colorSelector.selectedIndex].value;
-        const quantity = Number(quantitySelector.value);
-        const name = nameSelector.textContent;
-        const url = document.querySelector(".item__img img").src;
-        const altTxt = document.querySelector(".item__img img").alt;
+        if (isValidColor() && isValidQuantity()) {
+            const color = colorSelector.options[colorSelector.selectedIndex].value;
+            const quantity = Number(quantitySelector.value);
+            const name = nameSelector.textContent;
+            const url = document.querySelector(".item__img img").src;
+            const altTxt = document.querySelector(".item__img img").alt;
 
-        const item = {
-            id: productId,
-            color: color,
-            quantity: quantity,
-            name: name,
-            imageUrl: url,
-            altTxt: altTxt
-        };
+            const item = {
+                id: productId,
+                color: color,
+                quantity: quantity,
+                name: name,
+                imageUrl: url,
+                altTxt: altTxt
+            };
 
-        addToBasket(item);
-        window.location.href = "./cart.html";
-    } else {
-        if (!isValidColor()) {
-            alert("Merci de sélectionner une couleur");
-        } else if (!isValidQuantity()) {
-            const message = `Veuillez saisir une quantité comprise entre 1 et 100.\n
+            addToBasket(item);
+            window.location.href = "./cart.html";
+        } else {
+            if (!isValidColor()) {
+                alert("Merci de sélectionner une couleur");
+            } else if (!isValidQuantity()) {
+                const message = `Veuillez saisir une quantité comprise entre 1 et 100.\n
             - La valeur doit être un nombre entier (sans point ou virgule)
             - Pas de caractères alphabétiques
             - Pas de caractères spéciaux`;
-            alert(message);
-        }
+                alert(message);
+            }
 
-    }
-});
+        }
+    });
+}
