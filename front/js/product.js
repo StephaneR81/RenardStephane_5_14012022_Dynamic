@@ -39,7 +39,7 @@ async function fetchSofaDetails() {
 
         .catch(
             (error) => {
-                alert("Le produit n'a pu être affiché.\nVeuillez réessayer ultérieurement. ");
+                alert("Le produit n'a pu être affiché.\nMerci de revenir ultérieurement. ");
                 console.error(error);
             });
 }
