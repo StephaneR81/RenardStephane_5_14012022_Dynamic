@@ -78,8 +78,8 @@ function getProductURL() {
 //FORMULAR RELATED FUNCTIONS
 //Checks if the selected quantity is a number between 1 and 100. Returns boolean.
 function isValidQuantity() {
-    const value = quantitySelector.value;
-    return (isNaN(value) || value === "" || value < 1 || value > 100) ? false : true;
+    const value = Number(quantitySelector.value);
+    return (isNaN(value) || !Number.isInteger(value) ||value === "" || value < 1 || value > 100) ? false : true;
 }
 
 //Checks if a color has been selected. Returns boolean.
