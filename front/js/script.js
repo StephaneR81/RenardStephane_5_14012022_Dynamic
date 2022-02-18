@@ -40,21 +40,31 @@ function createProductCard(productsArray) {
 
 
 //GETTING PRODUCTS LIST AND CALLING createProductCard()
-fetch(ProductsURL)
+async function getProductsList() {
+    await fetch(ProductsURL)
 
-    .then(
-        function (response) {
-            return response.json();
-        }
-    )
+        .then(
+            function (response) {
+                return response.json();
+            }
+        )
 
-    .then(
-        function (productsArray) {
-            createProductCard(productsArray);
-        })
+        .then(
+            function (productsArray) {
+                createProductCard(productsArray);
+            })
 
-    .catch(
-        function (error) {
-            alert("La liste des produits n'a pu être affichée.\nVeuillez revenir ultérieurement. ");
-            console.error(error);
-        });
+        .catch(
+            function (error) {
+                alert("La liste des produits est provisoirement indisponible.\nMerci de revenir ultérieurement. ");
+                console.error(error);
+            });
+}
+
+//FIRST EXECUTED FUNCTION ON SCRIPT LOAD
+async function initialize() {
+    await getProductsList();
+}
+
+//CALL TO FUNCTION initialize()
+initialize();
