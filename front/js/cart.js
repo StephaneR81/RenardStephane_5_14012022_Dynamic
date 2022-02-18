@@ -4,8 +4,12 @@
 //|VARIABLES|
 //|||||||||||
 
-const errorMsgColor = "red";
-const inputErrorMsg = "Veuillez vérifier la saisie du champ ci-dessus";
+const errorMsgColor = "lightred";
+const firstNameInputErrorMsg = "<b>&#9888; Vérifiez le prénom</b> | 1 à 30 car. | A-Z a-z (éèëêàçüû-)";
+const lastNameInputErrorMsg = "<b>&#9888; Vérifiez le nom</b> | 1 à 30 car. | A-Z a-z (éèëêàçüû-)";
+const addressInputErrorMsg = "<b>&#9888; Vérifiez l'adresse</b> | 2 car. mini. | A-Z a-z 0-9 (éèëêàçüû-.,&#9141;)";
+const cityInputErrorMsg = "<b>&#9888; Vérifiez la ville</b> | 2 car. mini. |  A-Z a-z (éèëêàçüû-.,&#9141;)";
+const emailInputErrorMsg = "<b>&#9888; Vérifiez l'email</b> | 1 car. mini. | A-Z a-z 0-9 (-_.)";
 
 //Element selectors
 const cartItemsSelector = document.querySelector("#cart__items");
@@ -14,22 +18,27 @@ const totalQuantitySelector = document.querySelector("#totalQuantity");
 const totalPriceSelector = document.querySelector("#totalPrice");
 
 const firstNameSelector = document.querySelector("#firstName");
+firstNameSelector.setAttribute("placeholder", "ex. Jean-Jacques");
 const firstNameErrorMsgSelector = document.querySelector("#firstNameErrorMsg");
 firstNameErrorMsgSelector.style.color = errorMsgColor;
 
 const lastNameSelector = document.querySelector("#lastName");
+lastNameSelector.setAttribute("placeholder", "ex. Dupont");
 const lastNameErrorMsgSelector = document.querySelector("#lastNameErrorMsg");
 lastNameErrorMsgSelector.style.color = errorMsgColor;
 
 const addressSelector = document.querySelector("#address");
+addressSelector.setAttribute("placeholder", "ex. 1 rue des champs");
 const addressErrorMsgSelector = document.querySelector("#addressErrorMsg");
 addressErrorMsgSelector.style.color = errorMsgColor;
 
 const citySelector = document.querySelector("#city");
+citySelector.setAttribute("placeholder", "ex. Paris");
 const cityErrorMsgSelector = document.querySelector("#cityErrorMsg");
 cityErrorMsgSelector.style.color = errorMsgColor;
 
 const emailSelector = document.querySelector("#email");
+emailSelector.setAttribute("placeholder", "ex. jean-jacques.dupont@email.fr");
 const emailErrorMsgSelector = document.querySelector("#emailErrorMsg");
 emailErrorMsgSelector.style.color = errorMsgColor;
 
@@ -131,8 +140,10 @@ async function createSofaCard() {
         printTotalQuantity();
         printTotalPrice();
       } else {
-        inputQuantity.value = 1;
-        const message = `Veuillez saisir une quantité comprise entre 1 et 100.\n
+        // inputQuantity.value = 1;
+        const message = `
+        ${basket[key].name} ${basket[key].color}\n
+        Veuillez saisir une quantité comprise entre 1 et 100.\n
         - La valeur doit être un nombre entier (sans point ou virgule)
         - Pas de caractères alphabétiques
         - Pas de caractères spéciaux`;
@@ -146,13 +157,16 @@ async function createSofaCard() {
     const deleteItemElement = document.createElement("p");
     deleteItemElement.textContent = "Supprimer";
     deleteElement.addEventListener("click", () => { // Removes the deleted product from the page.
-      const closestArticle = deleteElement.closest("article"); //Getting the the first article parent element.
-      const itemToDeleteId = closestArticle.getAttribute("data-id"); //Getting the item ID from attribute "data-id" of the parent article element.
-      const itemToDeleteColor = closestArticle.childNodes[1].childNodes[0].childNodes[1].textContent; //Getting the color of the item to delete
-      removeFromBasket(itemToDeleteId, itemToDeleteColor);
-      closestArticle.remove();
-      printTotalQuantity();
-      printTotalPrice();
+      if (confirm('Souhaitez-vous vraiment supprimer cet article du panier ?') === true) {
+        const closestArticle = deleteElement.closest("article"); //Getting the the first article parent element.
+        const itemToDeleteId = closestArticle.getAttribute("data-id"); //Getting the item ID from attribute "data-id" of the parent article element.
+        const itemToDeleteColor = closestArticle.childNodes[1].childNodes[0].childNodes[1].textContent; //Getting the color of the item to delete
+        removeFromBasket(itemToDeleteId, itemToDeleteColor);
+        closestArticle.remove();
+        printTotalQuantity();
+        printTotalPrice();
+      }
+
     });
 
     //Appends HTML previously created elements.
@@ -220,7 +234,7 @@ function checkAddress() {
 
 //Checks city formular field. Returns boolean.
 function checkCity() {
-  const cityRegEx = new RegExp("^[A-Za-z0-9éèëêàçüû\-]{1,30}$");
+  const cityRegEx = new RegExp("^[A-Za-zéèëêàçüû\-]{1,30}$");
   if (!cityRegEx.test(citySelector.value)) {
     return false;
   }
@@ -242,11 +256,11 @@ function checkEmail() {
 function isValidFormular() {
   const isFormValid = checkFirstName() && checkLastname() && checkAddress() && checkCity() && checkEmail();
   if (!isFormValid) {
-    !checkFirstName() ? firstNameErrorMsgSelector.textContent = inputErrorMsg : null;
-    !checkLastname() ? lastNameErrorMsgSelector.textContent = inputErrorMsg : null;
-    !checkAddress() ? addressErrorMsgSelector.textContent = inputErrorMsg : null;
-    !checkCity() ? cityErrorMsgSelector.textContent = inputErrorMsg : null;
-    !checkEmail() ? emailErrorMsgSelector.textContent = inputErrorMsg : null;
+    !checkFirstName() ? firstNameErrorMsgSelector.innerHTML = firstNameInputErrorMsg : null;
+    !checkLastname() ? lastNameErrorMsgSelector.innerHTML = lastNameInputErrorMsg : null;
+    !checkAddress() ? addressErrorMsgSelector.innerHTML = addressInputErrorMsg : null;
+    !checkCity() ? cityErrorMsgSelector.innerHTML = cityInputErrorMsg : null;
+    !checkEmail() ? emailErrorMsgSelector.innerHTML = emailInputErrorMsg : null;
     return false;
   }
   return true;
