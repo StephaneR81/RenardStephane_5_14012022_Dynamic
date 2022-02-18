@@ -56,7 +56,7 @@ async function getProductsList() {
 
         .catch(
             function (error) {
-                alert("La liste des produits est provisoirement indisponible.\nMerci de revenir ultérieurement. ");
+                alert("La liste des produits est provisoirement indisponible.\nMerci de réessayer ultérieurement. ");
                 console.error(error);
             });
 }

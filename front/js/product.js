@@ -39,7 +39,7 @@ async function fetchSofaDetails() {
 
         .catch(
             (error) => {
-                alert("Le produit n'a pu être affiché.\nMerci de revenir ultérieurement. ");
+                alert("Le produit n'a pu être affiché.\nMerci de réessayer ultérieurement. ");
                 console.error(error);
             });
 }
@@ -151,7 +151,7 @@ submitSelector.addEventListener("click", () => {
         window.location.href = "./cart.html";
     } else {
         if (!isValidColor()) {
-            alert("Veuillez sélectionner une couleur");
+            alert("Merci de sélectionner une couleur");
         } else if (!isValidQuantity()) {
             const message = `Veuillez saisir une quantité comprise entre 1 et 100.\n
             - La valeur doit être un nombre entier (sans point ou virgule)
