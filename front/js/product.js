@@ -39,7 +39,7 @@ async function fetchSofaDetails() {
 
         .catch(
             (error) => {
-                alert("Le produit n'a pu être affiché.\nVeuillez retenter ultérieurement. ");
+                alert("Le produit n'a pu être affiché.\nVeuillez réessayer ultérieurement. ");
                 console.error(error);
             });
 }
@@ -79,7 +79,7 @@ function getProductURL() {
 //Checks if the selected quantity is a number between 1 and 100. Returns boolean.
 function isValidQuantity() {
     const value = Number(quantitySelector.value);
-    return (isNaN(value) || !Number.isInteger(value) ||value === "" || value < 1 || value > 100) ? false : true;
+    return (isNaN(value) || !Number.isInteger(value) || value === "" || value < 1 || value > 100) ? false : true;
 }
 
 //Checks if a color has been selected. Returns boolean.
@@ -150,6 +150,15 @@ submitSelector.addEventListener("click", () => {
         addToBasket(item);
         window.location.href = "./cart.html";
     } else {
-        alert("Vérifiez votre saisie");
+        if (!isValidColor()) {
+            alert("Veuillez sélectionner une couleur");
+        } else if (!isValidQuantity()) {
+            const message = `Veuillez saisir une quantité comprise entre 1 et 100.\n
+            - La valeur doit être un nombre entier (sans point ou virgule)
+            - Pas de caractères alphabétiques
+            - Pas de caractères spéciaux`;
+            alert(message);
+        }
+
     }
 });
