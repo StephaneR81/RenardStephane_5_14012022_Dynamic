@@ -16,7 +16,7 @@ function printOrderId() {
     orderIdSelector.textContent = getOrderID();
 }
 
-//Clears the local storage.
+//Clears the basket in localStorage.
 function clearBasket() {
     localStorage.clear();
 }
