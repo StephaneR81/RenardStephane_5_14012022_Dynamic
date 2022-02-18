@@ -115,20 +115,6 @@ function storeBasket(basket) {
     localStorage.setItem("basket", JSON.stringify(basket));
 }
 
-//FIRST FUNCTION TO BE EXECUTED ON SCRIPT LOAD
-async function initialize() {
-    await fetchSofaDetails();
-    addToCartListener();
-}
-
-initialize();
-
-
-
-//|||||||||||
-//|LISTENERS|
-//|||||||||||
-
 //Adds a "CLICK" listener to the "ADD TO CART" button.
 function addToCartListener() {
     submitSelector.addEventListener("click", () => {
@@ -165,3 +151,11 @@ function addToCartListener() {
         }
     });
 }
+
+//FIRST FUNCTION TO BE EXECUTED ON SCRIPT LOAD
+async function initialize() {
+    await fetchSofaDetails();
+    addToCartListener();
+}
+
+initialize();

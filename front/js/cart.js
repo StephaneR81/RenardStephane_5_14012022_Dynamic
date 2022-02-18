@@ -8,16 +8,16 @@ const errorMsgColor = "lightred";
 const firstNameInputErrorMsg = "<b>&#9888; Vérifiez le prénom</b> | 1 à 30 caractères alphabétiques.";
 const firstNameEmptyInputErrorMsg = "<b>&#9888; Entrez votre prénom</b> | 1 à 30 caractères alphabétiques.";
 
-const lastNameInputErrorMsg = "<b>&#9888; Vérifiez le nom</b> | 1 à 30 caractères alphabétiques.";
+const lastNameInputErrorMsg = "<b>&#9888; Vérifiez votre nom</b> | 1 à 30 caractères alphabétiques.";
 const lastNameEmptyInputErrorMsg = "<b>&#9888; Entrez votre nom</b> | 1 à 30 caractères alphabétiques.";
 
-const addressInputErrorMsg = "<b>&#9888; Vérifiez l'adresse</b> | 2 caractères alphanumériques minimum.";
+const addressInputErrorMsg = "<b>&#9888; Vérifiez votre adresse</b> | 2 caractères alphanumériques minimum.";
 const addressEmptyInputErrorMsg = "<b>&#9888; Entrez votre adresse</b> | 2 caractères alphanumériques minimum.";
 
-const cityInputErrorMsg = "<b>&#9888; Vérifiez la ville</b> | 2 caractères alphabétiques minimum.";
+const cityInputErrorMsg = "<b>&#9888; Vérifiez votre ville</b> | 2 caractères alphabétiques minimum.";
 const cityEmptyInputErrorMsg = "<b>&#9888; Entrez votre ville</b> | 2 caractères alphabétiques minimum.";
 
-const emailInputErrorMsg = "<b>&#9888; Vérifiez l'email</b> | 2 caractères alphanumériques minimum.";
+const emailInputErrorMsg = "<b>&#9888; Vérifiez votre adresse email</b> | 2 caractères alphanumériques minimum.";
 const emailEmptyInputErrorMsg = "<b>&#9888; Entrez votre adresse email</b> | 2 caractères alphanumériques minimum.";
 
 
@@ -55,11 +55,9 @@ emailErrorMsgSelector.style.color = errorMsgColor;
 const submitSelector = document.querySelector("#order");
 
 
-
 //|||||||||||
 //|FUNCTIONS|
 //|||||||||||
-
 
 //Returns pricesObj associating an item ID with its unit price fetched from API.
 async function getPrices() {
@@ -88,8 +86,6 @@ async function fetchPrices() {
       console.error(error);
     });
 }
-
-
 
 //Creates and prints the sofa card from basket element.
 async function createSofaCard() {
@@ -267,19 +263,19 @@ function isValidFormular() {
   const isFormValid = checkFirstName() && checkLastname() && checkAddress() && checkCity() && checkEmail();
   if (!isFormValid) {
     if (!checkFirstName()) {
-      firstNameSelector.value > 0 ? firstNameErrorMsgSelector.innerHTML = firstNameInputErrorMsg : firstNameErrorMsgSelector.innerHTML = firstNameEmptyInputErrorMsg;
+      firstNameSelector.value !== "" ? firstNameErrorMsgSelector.innerHTML = firstNameInputErrorMsg : firstNameErrorMsgSelector.innerHTML = firstNameEmptyInputErrorMsg;
     }
     if (!checkLastname()) {
-      lastNameSelector.value > 0 ? lastNameErrorMsgSelector.innerHTML = lastNameInputErrorMsg : lastNameErrorMsgSelector.innerHTML = lastNameEmptyInputErrorMsg;
+      lastNameSelector.value !== "" ? lastNameErrorMsgSelector.innerHTML = lastNameInputErrorMsg : lastNameErrorMsgSelector.innerHTML = lastNameEmptyInputErrorMsg;
     }
     if (!checkAddress()) {
-      addressSelector.value > 0 ? addressErrorMsgSelector.innerHTML = addressInputErrorMsg : addressErrorMsgSelector.innerHTML = addressEmptyInputErrorMsg;
+      addressSelector.value !== "" ? addressErrorMsgSelector.innerHTML = addressInputErrorMsg : addressErrorMsgSelector.innerHTML = addressEmptyInputErrorMsg;
     }
     if (!checkCity()) {
-      citySelector.value > 0 ? cityErrorMsgSelector.innerHTML = cityInputErrorMsg : cityErrorMsgSelector.innerHTML = cityEmptyInputErrorMsg;
+      citySelector.value !== "" ? cityErrorMsgSelector.innerHTML = cityInputErrorMsg : cityErrorMsgSelector.innerHTML = cityEmptyInputErrorMsg;
     }
     if (!checkEmail()) {
-      emailSelector.value > 0 ? emailErrorMsgSelector.innerHTML = emailInputErrorMsg : emailErrorMsgSelector.innerHTML = emailEmptyInputErrorMsg;
+      emailSelector.value !== "" ? emailErrorMsgSelector.innerHTML = emailInputErrorMsg : emailErrorMsgSelector.innerHTML = emailEmptyInputErrorMsg;
     }
     return false;
   }
@@ -432,19 +428,20 @@ function sendOrder() {
     });
 }
 
+//Adds an event listener to submit button
+function addSubmitListener() {
+  submitSelector.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (isValidFormular()) {
+      sendOrder();
+    }
+  });
+}
+
 //FIRST FUNCTION TO BE CALLED ON SCRIPT LOAD
 async function initialize() {
-  await createSofaCard();
+  createSofaCard();
+  addSubmitListener();
 }
 
 initialize();
-//|||||||||||
-//|LISTENERS|
-//|||||||||||
-
-submitSelector.addEventListener("click", (e) => {
-  e.preventDefault();
-  if (isValidFormular()) {
-    sendOrder();
-  }
-});
