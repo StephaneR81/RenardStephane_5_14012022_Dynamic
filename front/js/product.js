@@ -21,9 +21,9 @@ const submitSelector = document.querySelector("#addToCart");
 //|||||||||||
 
 //Fetches all informations from API for one product.
-function fetchSofaDetails() {
+async function fetchSofaDetails() {
 
-    fetch(getProductURL())
+    await fetch(getProductURL())
 
         .then(
             (response) => {
@@ -115,6 +115,13 @@ function storeBasket(basket) {
     localStorage.setItem("basket", JSON.stringify(basket));
 }
 
+//FIRST FUNCTION TO BE EXECUTED ON SCRIPT LOAD
+async function initialize() {
+    await fetchSofaDetails();
+}
+
+initialize();
+
 
 
 //|||||||||||
@@ -146,6 +153,3 @@ submitSelector.addEventListener("click", () => {
         alert("Vérifiez votre saisie");
     }
 });
-
-//Function call, to fetch product informations.
-fetchSofaDetails();
