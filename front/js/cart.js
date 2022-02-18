@@ -140,7 +140,7 @@ async function createSofaCard() {
         printTotalQuantity();
         printTotalPrice();
       } else {
-        // inputQuantity.value = 1;
+        inputQuantity.value = basket[key].quantity;
         const message = `
         ${basket[key].name} ${basket[key].color}\n
         Veuillez saisir une quantité comprise entre 1 et 100.\n
@@ -190,6 +190,16 @@ async function createSofaCard() {
 }
 
 //FORMULAR RELATED FUNCTIONS
+
+//Checks each product card's quantity. Returns true if all quantities are valid, else false.
+// function checkAllQuantities() {
+//   const quantityElements = document.getElementsByName('itemQuantity');
+
+//   for (const element in quantityElements) {
+//     console.log('test')
+//   }
+// }
+
 
 //Checks quantity input. Returns boolean.
 function checkQuantityInput(inputValue) {
@@ -428,3 +438,5 @@ submitSelector.addEventListener("click", (e) => {
     sendOrder();
   }
 });
+
+checkAllQuantities();
