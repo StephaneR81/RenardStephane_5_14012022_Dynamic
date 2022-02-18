@@ -1,11 +1,6 @@
 //KANAP CONFIRMATION PAGE SCRIPT
 
 //|||||||||||
-//|VARIABLES|
-//|||||||||||
-const orderIdSelector = document.querySelector("#orderId");
-
-//|||||||||||
 //|FUNCTIONS|
 //|||||||||||
 
@@ -15,8 +10,22 @@ function getOrderID() {
     return params.has("orderId") ? params.get("orderId") : "Numéro de commande indisponible";
 }
 
-//Prints the order ID 
-orderIdSelector.textContent = getOrderID();
+//Gets the corresponding DOM element and prints the order ID in it
+function printOrderId() {
+    const orderIdSelector = document.querySelector("#orderId");
+    orderIdSelector.textContent = getOrderID();
+}
 
 //Clears the local storage.
-localStorage.clear();
+function clearBasket() {
+    localStorage.clear();
+}
+
+//Function that runs on script load
+function initialize() {
+    printOrderId();
+    clearBasket();
+}
+
+//Calls initialise() function
+initialize();
