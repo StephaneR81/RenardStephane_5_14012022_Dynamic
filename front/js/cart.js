@@ -5,11 +5,21 @@
 //|||||||||||
 
 const errorMsgColor = "lightred";
-const firstNameInputErrorMsg = "<b>&#9888; Vérifiez le prénom</b> | 1 à 30 car. | A-Z a-z (éèëêàçüû-)";
-const lastNameInputErrorMsg = "<b>&#9888; Vérifiez le nom</b> | 1 à 30 car. | A-Z a-z (éèëêàçüû-)";
-const addressInputErrorMsg = "<b>&#9888; Vérifiez l'adresse</b> | 2 car. mini. | A-Z a-z 0-9 (éèëêàçüû-.,&#9141;)";
-const cityInputErrorMsg = "<b>&#9888; Vérifiez la ville</b> | 2 car. mini. |  A-Z a-z (éèëêàçüû-.,&#9141;)";
-const emailInputErrorMsg = "<b>&#9888; Vérifiez l'email</b> | 1 car. mini. | A-Z a-z 0-9 (-_.)";
+const firstNameInputErrorMsg = "<b>&#9888; Vérifiez le prénom</b> | 1 à 30 caractères alphabétiques.";
+const firstNameEmptyInputErrorMsg = "<b>&#9888; Entrez votre prénom</b> | 1 à 30 caractères alphabétiques.";
+
+const lastNameInputErrorMsg = "<b>&#9888; Vérifiez le nom</b> | 1 à 30 caractères alphabétiques.";
+const lastNameEmptyInputErrorMsg = "<b>&#9888; Entrez votre nom</b> | 1 à 30 caractères alphabétiques.";
+
+const addressInputErrorMsg = "<b>&#9888; Vérifiez l'adresse</b> | 2 caractères alphanumériques minimum.";
+const addressEmptyInputErrorMsg = "<b>&#9888; Entrez votre adresse</b> | 2 caractères alphanumériques minimum.";
+
+const cityInputErrorMsg = "<b>&#9888; Vérifiez la ville</b> | 2 caractères alphabétiques minimum.";
+const cityEmptyInputErrorMsg = "<b>&#9888; Entrez votre ville</b> | 2 caractères alphabétiques minimum.";
+
+const emailInputErrorMsg = "<b>&#9888; Vérifiez l'email</b> | 2 caractères alphanumériques minimum.";
+const emailEmptyInputErrorMsg = "<b>&#9888; Entrez votre adresse email</b> | 2 caractères alphanumériques minimum.";
+
 
 //Element selectors
 const cartItemsSelector = document.querySelector("#cart__items");
@@ -191,16 +201,6 @@ async function createSofaCard() {
 
 //FORMULAR RELATED FUNCTIONS
 
-//Checks each product card's quantity. Returns true if all quantities are valid, else false.
-// function checkAllQuantities() {
-//   const quantityElements = document.getElementsByName('itemQuantity');
-
-//   for (const element in quantityElements) {
-//     console.log('test')
-//   }
-// }
-
-
 //Checks quantity input. Returns boolean.
 function checkQuantityInput(inputValue) {
   const value = Number(inputValue);
@@ -266,11 +266,21 @@ function checkEmail() {
 function isValidFormular() {
   const isFormValid = checkFirstName() && checkLastname() && checkAddress() && checkCity() && checkEmail();
   if (!isFormValid) {
-    !checkFirstName() ? firstNameErrorMsgSelector.innerHTML = firstNameInputErrorMsg : null;
-    !checkLastname() ? lastNameErrorMsgSelector.innerHTML = lastNameInputErrorMsg : null;
-    !checkAddress() ? addressErrorMsgSelector.innerHTML = addressInputErrorMsg : null;
-    !checkCity() ? cityErrorMsgSelector.innerHTML = cityInputErrorMsg : null;
-    !checkEmail() ? emailErrorMsgSelector.innerHTML = emailInputErrorMsg : null;
+    if (!checkFirstName()) {
+      firstNameSelector.value > 0 ? firstNameErrorMsgSelector.innerHTML = firstNameInputErrorMsg : firstNameErrorMsgSelector.innerHTML = firstNameEmptyInputErrorMsg;
+    }
+    if (!checkLastname()) {
+      lastNameSelector.value > 0 ? lastNameErrorMsgSelector.innerHTML = lastNameInputErrorMsg : lastNameErrorMsgSelector.innerHTML = lastNameEmptyInputErrorMsg;
+    }
+    if (!checkAddress()) {
+      addressSelector.value > 0 ? addressErrorMsgSelector.innerHTML = addressInputErrorMsg : addressErrorMsgSelector.innerHTML = addressEmptyInputErrorMsg;
+    }
+    if (!checkCity()) {
+      citySelector.value > 0 ? cityErrorMsgSelector.innerHTML = cityInputErrorMsg : cityErrorMsgSelector.innerHTML = cityEmptyInputErrorMsg;
+    }
+    if (!checkEmail()) {
+      emailSelector.value > 0 ? emailErrorMsgSelector.innerHTML = emailInputErrorMsg : emailErrorMsgSelector.innerHTML = emailEmptyInputErrorMsg;
+    }
     return false;
   }
   return true;
@@ -438,5 +448,3 @@ submitSelector.addEventListener("click", (e) => {
     sendOrder();
   }
 });
-
-checkAllQuantities();
