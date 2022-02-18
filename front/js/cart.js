@@ -70,7 +70,7 @@ async function fetchPrices() {
     });
 }
 
-createSofaCard();
+
 
 //Creates and prints the sofa card from basket element.
 async function createSofaCard() {
@@ -132,7 +132,11 @@ async function createSofaCard() {
         printTotalPrice();
       } else {
         inputQuantity.value = 1;
-        alert("Veuillez vérifier la quantité saisie");
+        const message = `Veuillez saisir une quantité comprise entre 1 et 100.\n
+        - La valeur doit être un nombre entier (sans point ou virgule)
+        - Pas de caractères alphabétiques
+        - Pas de caractères spéciaux`;
+        alert(message);
       }
     });
 
@@ -394,8 +398,12 @@ function sendOrder() {
     });
 }
 
+//FIRST FUNCTION TO BE CALLED ON SCRIPT LOAD
+async function initialize() {
+  await createSofaCard();
+}
 
-
+initialize();
 //|||||||||||
 //|LISTENERS|
 //|||||||||||
@@ -406,6 +414,3 @@ submitSelector.addEventListener("click", (e) => {
     sendOrder();
   }
 });
-
-
-// FUNCTION CALL
